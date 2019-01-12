@@ -203,8 +203,7 @@ class ResourceProvider {
     .then( ( response ) async {
       List<dynamic> items = List<dynamic>.from(jsonDecode( response.body ));
       
-      print('Response: ${response.statusCode} ${items.length}');
-
+      //print('Response: ${response.statusCode} ${items.length}');
       List<Resource> resources = items.map( ( item ){
         return Resource.fromJson( item ); 
       }).toList();
