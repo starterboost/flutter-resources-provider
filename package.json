@@ -1,0 +1,9 @@
+{
+  "name": "FlutterResourcesSync",
+  "version": "1.0.0",
+  "author": "Jimib",
+  "license": "MIT",
+  "scripts" : {
+    "test:watch" : "nodemon --watch lib --watch test --exec \"flutter test\" -e dart"
+  }
+}
