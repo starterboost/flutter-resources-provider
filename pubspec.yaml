@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   http: any
+  crypto: any
   flutter:
     sdk: flutter
 

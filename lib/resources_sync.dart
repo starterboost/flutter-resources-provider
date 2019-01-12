@@ -3,24 +3,37 @@ library resources_sync;
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'package:convert/convert.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+import 'package:crypto/crypto.dart' as crypto;
 
 class _ResourceStat{
-  _ResourceStat();
+  _ResourceStat({
+    @required this.size
+  });
+  final int size;
 
   factory _ResourceStat.fromJson(Map<String, dynamic> json){
-    return _ResourceStat();
+    return _ResourceStat(
+      size : json['size']
+    );
   }
 }
 class _Resource{
-  _Resource({@required this.path, @required this.stat});
+  _Resource({
+    @required this.path, 
+    @required this.hash, 
+    @required this.stat
+  });
   final String path;
+  final String hash;
   final _ResourceStat stat;
 
   factory _Resource.fromJson(Map<String, dynamic> json){
     return _Resource(
       path : json['path'],
+      hash : json['hash'],
       stat : _ResourceStat.fromJson( json['stat'] )
     );
   }
@@ -39,6 +52,7 @@ class ResourceSync {
     await dirTarget.exists().then( (exists) async {
       if( !exists )return dirTarget.create(recursive: true);
     });
+
 
     //get the full list of contents
     List<File> files = <File>[];
@@ -68,11 +82,40 @@ class ResourceSync {
         File file = File( path.join( dirTarget.path, resource.path ) );
         bool exists = await file.exists();
         
-        files.removeWhere( ( item ){
+        File fileOriginal = files.firstWhere( ( item ){
           return item.path == file.path ? true : false;
         });
+        
+        bool downloadFile = !exists;
 
-        if( !exists ){
+        //remove the file from the list
+        if( fileOriginal != null ){
+          files.remove( fileOriginal );
+          int size = await fileOriginal.length();
+          print("Exists $exists $fileOriginal $size $downloadFile");
+
+          if( size != resource.stat.size ){
+            print("enableDownload due to size");
+            downloadFile = true;
+          }else{
+            List<int> content = await fileOriginal.readAsBytes();
+            crypto.MD5 md5 = crypto.md5;
+            crypto.Digest digest = md5.convert(content);
+            
+            String hash = hex.encode(digest.bytes);
+
+            if( hash != resource.hash ){
+              print("enableDownload due to hash");
+              downloadFile = true;
+            }
+            print( hash );
+            print( resource.hash );
+          }
+
+        }
+
+        if( downloadFile ){
+          print('Downloading ${file.path}');
           await file.create(recursive: true);
           //download and save file
           await new HttpClient().getUrl(Uri.parse(
