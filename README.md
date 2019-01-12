@@ -1,9 +1,18 @@
-# resources_sync
+# resources_provider
 
-A new Flutter package project.
+Provides a simple interface to a local directory of resources, with the option to sync with an online resource provider such as [Node-Resource-Provider](https://github.com/starterboost/node-resources-provider)
 
-## Getting Started
+## See test
 
-For help getting started with Flutter, view our online [documentation](https://flutter.io/).
+```
+Directory dirTemp = Directory.current;
 
-For help on editing package code, view the [documentation](https://flutter.io/developing-packages/).
+final resourceSync = ResourceProvider( 
+	dirTarget: Directory( path.join( dirTemp.path, '../temp/resources' ).toString() )  
+);
+
+//get the current list of files
+List<Resource> list = await resourceSync.getFiles();
+//resync the content with an online provider
+await resourceSync.sync( 'http://localhost:4000/resources' );
+```
