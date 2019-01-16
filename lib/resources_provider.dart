@@ -198,8 +198,10 @@ class ResourceProvider {
 
     //get the full list of contents
     List<Resource> files = await this.getFiles();
-    
-    return http.get( "$urlSource$pathToCache" )
+    String srcCache = "$urlSource$pathToCache";
+
+    print("sync \"$srcCache\"");
+    return http.get( srcCache )
     .then( ( response ) async {
       List<dynamic> items = List<dynamic>.from(jsonDecode( response.body ));
       
@@ -235,15 +237,16 @@ class ResourceProvider {
             }
           }
         }
-          
         
+        String downloadUrl = path.join( urlSource, resource.path );
+        print("downloadFile $downloadFile:\"$downloadUrl\"");
 
         if( downloadFile ){
           //print('Downloading ${file.path}');
           await file.create(recursive: true);
           //download and save file
           await new HttpClient().getUrl(Uri.parse(
-            path.join( urlSource, resource.path )
+            downloadUrl
           ))
           .then((HttpClientRequest request) => request.close())
           .then((HttpClientResponse response) => response.pipe( file.openWrite() ))
