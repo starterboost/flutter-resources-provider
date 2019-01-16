@@ -1,6 +1,6 @@
 name: resources_provider
-description: A new Flutter package project.
-version: 0.0.1
+description: Lists localised content with option to sync from an online Provider (such as Node-Resource-Provider)
+version: 0.0.2
 author:
 homepage:
 

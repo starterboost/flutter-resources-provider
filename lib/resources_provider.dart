@@ -189,7 +189,7 @@ class ResourceProvider {
   }
 
   /// Returns [value] plus 1.
-  Future<void> sync( String urlSource ) async {
+  Future<void> sync( String urlSource, {String pathToCache = ""} ) async {
     //now that it's been created
     await dirTarget.exists().then( (exists) async {
       if( !exists )return dirTarget.create(recursive: true);
@@ -199,7 +199,7 @@ class ResourceProvider {
     //get the full list of contents
     List<Resource> files = await this.getFiles();
     
-    return http.get( urlSource )
+    return http.get( "$urlSource$pathToCache" )
     .then( ( response ) async {
       List<dynamic> items = List<dynamic>.from(jsonDecode( response.body ));
       
